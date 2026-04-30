@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LalaSkye/fail-closed-ai/reference/decision_record.schema.json",
+  "title": "DecisionRecord",
+  "description": "A scoped authority record required before an AI-controlled action may become consequence.",
+  "type": "object",
+  "required": [
+    "decision_id",
+    "actor",
+    "authority_source",
+    "target",
+    "scope",
+    "issued_at",
+    "expires_at",
+    "nonce",
+    "signature"
+  ],
+  "properties": {
+    "decision_id": {
+      "type": "string",
+      "description": "Unique identifier for this decision record."
+    },
+    "actor": {
+      "type": "string",
+      "description": "The system, agent, service, or human requesting the transition."
+    },
+    "authority_source": {
+      "type": "string",
+      "description": "The policy, human authority, role, or signed source granting permission."
+    },
+    "target": {
+      "type": "string",
+      "description": "The exact mutation, action, system, or consequence surface being authorised."
+    },
+    "scope": {
+      "type": "object",
+      "description": "The permitted boundary of the transition.",
+      "additionalProperties": true
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the record was issued."
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the record stops being valid."
+    },
+    "nonce": {
+      "type": "string",
+      "description": "Unique replay-prevention value."
+    },
+    "signature": {
+      "type": "string",
+      "description": "Cryptographic or equivalent binding proof over the decision record."
+    }
+  },
+  "additionalProperties": false
+}
