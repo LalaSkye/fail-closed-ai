@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LalaSkye/fail-closed-ai/reference/receipt.schema.json",
+  "title": "ExecutionReceipt",
+  "description": "A receipt proving what happened at the boundary where an AI-controlled action could have become consequence.",
+  "type": "object",
+  "required": [
+    "receipt_id",
+    "timestamp",
+    "attempted_action",
+    "decision_id",
+    "verdict",
+    "check_results",
+    "execution_occurred"
+  ],
+  "properties": {
+    "receipt_id": {
+      "type": "string",
+      "description": "Unique identifier for this receipt."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the boundary verdict was produced."
+    },
+    "attempted_action": {
+      "type": "string",
+      "description": "The action or mutation that attempted to cross the boundary."
+    },
+    "decision_id": {
+      "type": ["string", "null"],
+      "description": "The DecisionRecord identifier, or null if no valid record was present."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["ALLOW", "HOLD", "DENY"],
+      "description": "The boundary verdict."
+    },
+    "check_results": {
+      "type": "object",
+      "description": "Named results for authority, scope, freshness, replay, signature, and receipt checks.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "execution_occurred": {
+      "type": "boolean",
+      "description": "Whether the attempted action became consequence."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable reason for the verdict."
+    }
+  },
+  "additionalProperties": false
+}
