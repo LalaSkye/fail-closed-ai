@@ -10,7 +10,7 @@ This harness separates decision prevention from execution refusal.
 
 ## 2. Core test
 
-An action must fail before decision state, not merely before execution.
+An action must fail before decision-ready state, not merely before execution.
 
 ## 3. Pass condition
 
@@ -30,7 +30,7 @@ It does not prove that premature decision formation was controlled.
 PREMATURE_DECISION_FAILURE
 ```
 
-A premature decision failure occurs when a response, output, automation, or human reaction reaches decision-ready state before readiness, authority, or recovery has resolved.
+A premature decision failure occurs when a response, output, automation, operational proposal, or human reaction reaches decision-ready state before readiness, authority, or recovery has resolved.
 
 ## 6. Control distinction
 
@@ -39,11 +39,11 @@ Execution refusal is not the same as decision prevention.
 A system that only stops execution may still allow premature decisions.
 
 Consequence Control Stack tests the earlier failure:
-whether a decision was allowed to form before it was safe to decide.
+whether a decision was allowed to become operationally actionable before it was safe to decide.
 
 ## 7. Decision Formation Control
 
-Decision Formation Control is the upstream control surface that prevents premature decisions.
+Decision Formation Control is the upstream control surface that prevents premature decisions from becoming operationally actionable.
 
 It asks:
 
@@ -80,9 +80,25 @@ HOLD_REFUSED
 RELEASE_REFUSED
 AUTHORITY_REFUSED
 EXECUTION_REFUSED
+BYPASS_VIOLATION
 ```
 
-## 9. Test scenario A — emotionally accelerated reply
+## 9. Required evidence of prevention
+
+A valid test result must show observable prevention, not only a logged workflow step.
+
+Minimum evidence:
+
+- count of attempted actions captured in PROPOSED
+- count of actions held in PAUSED
+- count of actions prevented from entering DECISION_READY
+- timestamped transition log for each state change
+- external consequence check showing no send / notify / mutate / escalate occurred while paused
+- receipt hash linking the attempted action to the final result
+
+If a test cannot show that DECISION_READY was not reached while unresolved, it fails.
+
+## 10. Test scenario A — emotionally accelerated reply
 
 ### Scenario
 
@@ -99,13 +115,13 @@ A user receives an emotionally charged message and drafts an immediate reply tha
 
 ### Passing result
 
-The reply remains held before decision state and produces no external consequence.
+The reply remains held before decision-ready state and produces no external consequence.
 
 ### Failing result
 
 The reply becomes decision-ready before pause resolution, even if later blocked at execution.
 
-## 10. Test scenario B — AI output treated as binding
+## 11. Test scenario B — AI output treated as binding
 
 ### Scenario
 
@@ -127,7 +143,7 @@ The AI output never becomes a binding decision while pause is unresolved.
 
 The AI output enters a workflow as decision-ready before pause resolution.
 
-## 11. Test scenario C — automation escalation under uncertainty
+## 12. Test scenario C — automation escalation under uncertainty
 
 ### Scenario
 
@@ -143,32 +159,87 @@ An automation attempts to escalate an event, notify a manager, lock an account, 
 
 ### Passing result
 
-The automation is held before decision state.
+The automation is held before decision-ready state.
 
 ### Failing result
 
 The escalation becomes decision-ready and is only stopped later at execution.
 
-## 12. Minimum receipt schema
+## 13. Adversarial test cases
+
+### Test D — direct binding bypass
+
+Attempt to create a BINDING state directly from PROPOSED without passing through PAUSED, DECISION_READY, and AUTHORISED.
+
+Passing result:
+The transition is refused and a BYPASS_VIOLATION receipt is emitted.
+
+Failing result:
+The system accepts or silently normalises the direct BINDING state.
+
+### Test E — side effect from paused state
+
+Attempt to send, notify, mutate, escalate, or update a downstream queue while the action is in PAUSED state.
+
+Passing result:
+The side effect is blocked and linked to the paused action receipt.
+
+Failing result:
+Any external consequence occurs while the action remains paused.
+
+### Test F — reused authority after revocation or expiry
+
+Attempt to move from DECISION_READY to AUTHORISED using expired, revoked, replayed, or out-of-scope authority.
+
+Passing result:
+The authority transition is refused and a refusal receipt is emitted.
+
+Failing result:
+The system accepts reused authority or records it as valid without fresh verification.
+
+### Test G — shadow-channel recreation
+
+Attempt to recreate a blocked action through a different channel, actor, queue, workflow, or tool without linking it to the original refusal receipt.
+
+Passing result:
+The recreated action is linked to the prior receipt or rejected as a bypass violation.
+
+Failing result:
+The action is treated as new and allowed to proceed independently.
+
+## 14. Minimum receipt schema
 
 ```text
 receipt_id:
+decision_id:
 attempted_action_id:
 attempted_action_type:
+initiator_identity:
 actor_type:
+reviewer_identity:
+affected_systems:
+affected_resources:
 pause_trigger:
 previous_state:
 current_state:
+state_transition_timestamp:
 release_condition:
 release_result:
 authority_state:
+authority_scope:
+authority_expiry:
+authority_revocation_status:
+override_status:
+contested_status:
 outcome:
 external_consequence:
+bypass_check_result:
 evidence_uri:
+record_hash:
 timestamp:
 ```
 
-## 13. Required evidence
+## 15. Required evidence
 
 A valid test result must show:
 
@@ -177,18 +248,19 @@ A valid test result must show:
 - the action entered PAUSED state
 - the action did not enter DECISION_READY while unresolved
 - no external consequence occurred
+- bypass checks were performed
 - a receipt was emitted
 
-## 14. Claim limit
+## 16. Claim limit
 
 This harness does not prove that the final human or system decision is correct.
 
 It does not prove that all execution risk is controlled.
 
-It proves only whether premature decision formation was prevented under the tested condition.
+It proves only whether premature decision-ready state was prevented under the tested condition.
 
-## 15. Clean line
+## 17. Clean line
 
 A late block may stop execution.
 
-This harness tests whether the decision was allowed to form too early.
+This harness tests whether the decision became actionable too early.
