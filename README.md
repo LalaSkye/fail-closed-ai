@@ -154,6 +154,14 @@ Good. That is what makes it engineering.
 
 ---
 
+## What this does not prove
+
+This repository does not prove adoption, certification, standardisation, or production readiness.
+
+It demonstrates a bounded execution-control surface that can be run, inspected, and tested.
+
+---
+
 ## Design principles
 
 - Stop is a first-class primitive.
