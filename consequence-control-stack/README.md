@@ -1,5 +1,7 @@
 # Consequence Control Stack
 
+STATUS: design + test artefacts only. No reference implementation. No adoption claim.
+
 Status: bounded artefact. No implementation. No adoption claim.
 
 ## Purpose
