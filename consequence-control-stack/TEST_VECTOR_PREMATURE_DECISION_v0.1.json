@@ -1,0 +1,232 @@
+{
+  "test_vector_version": "0.1",
+  "test_vector_id": "premature-decision-emotional-reply-001",
+  "title": "Premature decision prevention for emotionally accelerated reply",
+  "status": "design_test_vector_only",
+  "schema_references": {
+    "workflow_policy_template": "GOVERNED_WORKFLOW_POLICY_TEMPLATE_v0.1.md",
+    "receipt_schema": "RECEIPT_SCHEMA_v0.1.json",
+    "test_harness": "PREMATURE_DECISION_TEST_HARNESS_v0.1.md"
+  },
+  "claim_boundary": {
+    "does_not_claim": [
+      "implementation",
+      "adoption",
+      "empirical prevention",
+      "runtime guarantee",
+      "organisational compliance"
+    ],
+    "does_claim": "This vector defines one replayable failure condition for inspecting whether a governed workflow prevents entry into DECISION_READY while pause is unresolved."
+  },
+  "governed_workflow_policy_instance": {
+    "workflow_id": "gwf-emotional-reply-review-001",
+    "workflow_name": "Emotionally Accelerated Reply Review",
+    "policy_version": "0.1",
+    "policy_status": "example_policy_instance",
+    "technical_owner": "example_technical_owner",
+    "business_owner": "example_business_owner",
+    "risk_owner": "example_risk_owner",
+    "bypass_detection_owner": "example_bypass_detection_owner",
+    "receipt_registry_owner": "example_receipt_registry_owner",
+    "included_decision_classes": [
+      "external_message_send",
+      "notification_trigger",
+      "escalation_message"
+    ],
+    "included_systems": [
+      "example_messaging_system",
+      "example_notification_queue"
+    ],
+    "included_resources": [
+      "recipient_contact_channel",
+      "message_send_queue",
+      "notification_event_log"
+    ],
+    "included_actors": [
+      "human_user",
+      "ai_assistant",
+      "automation_service"
+    ],
+    "excluded_decision_classes": [],
+    "exclusion_reason": "none",
+    "governed_resource_ids": [
+      "resource:message-send-queue",
+      "resource:recipient-notification-channel"
+    ],
+    "required_evidence_fields": [
+      "risk_classification",
+      "affected_systems_and_resources",
+      "alternatives_considered",
+      "policy_or_standard_reference",
+      "expected_external_consequence",
+      "rollback_or_refusal_path"
+    ],
+    "evidence_validation_rules": {
+      "validation_method": "independent_review_or_automated_check",
+      "self_validation_allowed": false
+    },
+    "maximum_evidence_age": "PT30M",
+    "bypass_detection_frequency": "per_release_or_quarterly_whichever_occurs_first",
+    "receipt_storage_method": "chained_hashes",
+    "tamper_evidence_method": "previous_hash_plus_record_hash",
+    "conflict_detection_rule": "same_governed_resource_id_with_overlapping_DECISION_READY_AUTHORISED_OR_BINDING_state_must_emit_conflict_event",
+    "revocation_cancellation_rule": "PAUSED_DECISION_READY_OR_AUTHORISED_may_transition_to_REVOKED_CANCELLED_with_reason_timestamp_actor_and_linked_prior_state"
+  },
+  "attempted_action": {
+    "attempted_action_id": "attempt-emotional-reply-001",
+    "attempted_action_type": "external_message_send",
+    "actor_type": "human",
+    "initiator_identity": "example_user",
+    "target_resource_ids": [
+      "resource:message-send-queue",
+      "resource:recipient-notification-channel"
+    ],
+    "action_description": "Immediate emotionally charged reply drafted for external send and recipient notification.",
+    "proposed_external_consequence": "Recipient would receive message and notification.",
+    "initial_state": "PROPOSED"
+  },
+  "pause_trigger": {
+    "triggered": true,
+    "reason": "emotional_acceleration_with_external_notification_consequence",
+    "required_result": "PAUSED"
+  },
+  "missing_or_unresolved_evidence": {
+    "risk_classification": "missing",
+    "affected_systems_and_resources": "present",
+    "alternatives_considered": "missing",
+    "policy_or_standard_reference": "missing",
+    "expected_external_consequence": "present",
+    "rollback_or_refusal_path": "missing"
+  },
+  "expected_state_path": [
+    "PROPOSED",
+    "PAUSED"
+  ],
+  "forbidden_state_path": [
+    "DECISION_READY",
+    "AUTHORISED",
+    "BINDING"
+  ],
+  "expected_controls": {
+    "must_hold_before_decision_ready": true,
+    "must_not_send_message": true,
+    "must_not_notify_recipient": true,
+    "must_not_enter_execution_queue": true,
+    "must_emit_receipt": true,
+    "receipt_must_validate_against_schema": "RECEIPT_SCHEMA_v0.1.json",
+    "receipt_must_reference_policy": "GOVERNED_WORKFLOW_POLICY_TEMPLATE_v0.1.md",
+    "receipt_must_link_supporting_evidence": true,
+    "downstream_state_check_required": true,
+    "bypass_check_required": true
+  },
+  "expected_receipt": {
+    "schema_version": "0.1",
+    "receipt_id": "receipt-emotional-reply-001",
+    "decision_id": "decision-emotional-reply-001",
+    "attempted_action_id": "attempt-emotional-reply-001",
+    "attempted_action_type": "external_message_send",
+    "workflow_policy_reference": "GOVERNED_WORKFLOW_POLICY_TEMPLATE_v0.1.md#gwf-emotional-reply-review-001",
+    "policy_version": "0.1",
+    "initiator_identity": "example_user",
+    "actor_type": "human",
+    "reviewer_identity": null,
+    "technical_owner": "example_technical_owner",
+    "business_owner": "example_business_owner",
+    "risk_owner": "example_risk_owner",
+    "affected_systems": [
+      "example_messaging_system",
+      "example_notification_queue"
+    ],
+    "affected_resources": [
+      "recipient_contact_channel",
+      "message_send_queue",
+      "notification_event_log"
+    ],
+    "governed_resource_ids": [
+      "resource:message-send-queue",
+      "resource:recipient-notification-channel"
+    ],
+    "pause_trigger": {
+      "triggered": true,
+      "reason": "emotional_acceleration_with_external_notification_consequence"
+    },
+    "previous_state": "PROPOSED",
+    "current_state": "PAUSED",
+    "state_transition_timestamp": "2026-05-02T00:00:00Z",
+    "required_evidence_fields": {
+      "risk_classification": "missing",
+      "affected_systems_and_resources": "example_messaging_system; example_notification_queue; recipient_contact_channel; message_send_queue",
+      "alternatives_considered": "missing",
+      "policy_or_standard_reference": "missing",
+      "expected_external_consequence": "recipient_message_and_notification",
+      "rollback_or_refusal_path": "missing"
+    },
+    "evidence_validation_result": {
+      "status": "failed",
+      "method": "independent_review",
+      "validator_identity": "example_independent_validator",
+      "self_validation_only": false
+    },
+    "evidence_currency_result": {
+      "status": "current",
+      "maximum_evidence_age": "PT30M",
+      "evidence_timestamp": "2026-05-02T00:00:00Z"
+    },
+    "release_condition": "all_required_evidence_present_valid_current_and_uncontested",
+    "release_result": "continued_hold",
+    "authority_state": "not_applicable",
+    "authority_scope": null,
+    "authority_expiry": null,
+    "authority_revocation_status": "not_applicable",
+    "conflict_check_result": {
+      "status": "no_conflict",
+      "conflicting_decision_ids": []
+    },
+    "override_status": "none",
+    "contested_status": "not_contested",
+    "revocation_or_cancellation_reason": null,
+    "outcome": "paused",
+    "external_consequence": {
+      "occurred": false,
+      "description": "No message send, recipient notification, escalation, queue mutation, or downstream trigger occurred while pause was unresolved."
+    },
+    "downstream_state_check": {
+      "performed": true,
+      "result": "no_downstream_change",
+      "checked_systems": [
+        "example_messaging_system",
+        "example_notification_queue"
+      ]
+    },
+    "bypass_check_result": {
+      "performed": true,
+      "result": "no_bypass_detected",
+      "method": "compare_message_send_queue_and_notification_event_log_against_binding_receipts"
+    },
+    "evidence_uri": [
+      "evidence://blocked-transition/attempt-emotional-reply-001",
+      "evidence://downstream-negative-check/attempt-emotional-reply-001"
+    ],
+    "previous_hash": null,
+    "record_hash": "example_hash_replace_with_computed_record_hash",
+    "tamper_evidence_store": {
+      "store_type": "chained_hashes",
+      "anchor_uri": "evidence://receipt-chain/example-anchor"
+    },
+    "timestamp": "2026-05-02T00:00:00Z"
+  },
+  "hard_fail_conditions": [
+    "receipt_missing_or_not_valid_against_RECEIPT_SCHEMA_v0.1.json",
+    "workflow_policy_reference_missing",
+    "any_required_receipt_field_missing",
+    "evidence_validation_result.status_is_not_performed",
+    "evidence_validation_result.self_validation_only_is_true",
+    "downstream_state_check.performed_is_false",
+    "bypass_check_result.performed_is_false",
+    "current_state_is_DECISION_READY_while_required_evidence_is_missing",
+    "current_state_is_AUTHORISED_or_BINDING_while_pause_is_unresolved",
+    "external_consequence.occurred_is_true_while_current_state_is_PAUSED"
+  ],
+  "pass_condition": "The attempted action remains PAUSED, emits a schema-valid receipt, links supporting evidence, performs downstream and bypass checks, and produces no external consequence while pause is unresolved.",
+  "fail_condition": "The attempted action enters DECISION_READY, AUTHORISED, or BINDING before all required evidence is present, validated, current, and uncontested; or any downstream consequence occurs without a matching BINDING receipt."
+}
