@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LalaSkye/fail-closed-ai/consequence-control-stack/RECEIPT_SCHEMA_v0.1.json",
+  "title": "Consequence Control Stack Receipt Schema v0.1",
+  "description": "Machine-readable receipt schema for governed workflows under the Consequence Control Stack. A receipt without linked supporting evidence proves declared process only, not factual prevention.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "decision_id",
+    "attempted_action_id",
+    "attempted_action_type",
+    "workflow_policy_reference",
+    "policy_version",
+    "initiator_identity",
+    "actor_type",
+    "technical_owner",
+    "business_owner",
+    "risk_owner",
+    "affected_systems",
+    "affected_resources",
+    "governed_resource_ids",
+    "pause_trigger",
+    "previous_state",
+    "current_state",
+    "state_transition_timestamp",
+    "required_evidence_fields",
+    "evidence_validation_result",
+    "evidence_currency_result",
+    "release_condition",
+    "release_result",
+    "authority_state",
+    "authority_scope",
+    "authority_expiry",
+    "authority_revocation_status",
+    "conflict_check_result",
+    "override_status",
+    "contested_status",
+    "outcome",
+    "external_consequence",
+    "downstream_state_check",
+    "bypass_check_result",
+    "evidence_uri",
+    "previous_hash",
+    "record_hash",
+    "tamper_evidence_store",
+    "timestamp"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempted_action_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempted_action_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workflow_policy_reference": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the completed governed workflow policy file based on GOVERNED_WORKFLOW_POLICY_TEMPLATE_v0.1.md."
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "initiator_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actor_type": {
+      "type": "string",
+      "enum": ["human", "ai_system", "automation", "service", "unknown"]
+    },
+    "reviewer_identity": {
+      "type": ["string", "null"]
+    },
+    "technical_owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "business_owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "risk_owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "affected_systems": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "affected_resources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "governed_resource_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "pause_trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["triggered", "reason"],
+      "properties": {
+        "triggered": { "type": "boolean" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "previous_state": {
+      "$ref": "#/$defs/state"
+    },
+    "current_state": {
+      "$ref": "#/$defs/state"
+    },
+    "state_transition_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "required_evidence_fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "risk_classification",
+        "affected_systems_and_resources",
+        "alternatives_considered",
+        "policy_or_standard_reference",
+        "expected_external_consequence",
+        "rollback_or_refusal_path"
+      ],
+      "properties": {
+        "risk_classification": { "type": "string", "minLength": 1 },
+        "affected_systems_and_resources": { "type": "string", "minLength": 1 },
+        "alternatives_considered": { "type": "string", "minLength": 1 },
+        "policy_or_standard_reference": { "type": "string", "minLength": 1 },
+        "expected_external_consequence": { "type": "string", "minLength": 1 },
+        "rollback_or_refusal_path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence_validation_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "method", "validator_identity", "self_validation_only"],
+      "properties": {
+        "status": { "type": "string", "enum": ["passed", "failed", "not_performed"] },
+        "method": { "type": "string", "enum": ["automated_check", "independent_review", "not_performed"] },
+        "validator_identity": { "type": ["string", "null"] },
+        "self_validation_only": { "type": "boolean", "const": false }
+      }
+    },
+    "evidence_currency_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "maximum_evidence_age", "evidence_timestamp"],
+      "properties": {
+        "status": { "type": "string", "enum": ["current", "stale", "not_checked"] },
+        "maximum_evidence_age": { "type": "string", "minLength": 1 },
+        "evidence_timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "release_condition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "release_result": {
+      "type": "string",
+      "enum": ["released", "continued_hold", "release_refused", "not_applicable"]
+    },
+    "authority_state": {
+      "type": "string",
+      "enum": ["present", "absent", "expired", "revoked", "unscoped", "replayed", "unresolved", "not_applicable"]
+    },
+    "authority_scope": {
+      "type": ["string", "null"]
+    },
+    "authority_expiry": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "authority_revocation_status": {
+      "type": "string",
+      "enum": ["not_revoked", "revoked", "not_checked", "not_applicable"]
+    },
+    "conflict_check_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "conflicting_decision_ids"],
+      "properties": {
+        "status": { "type": "string", "enum": ["no_conflict", "conflict_detected", "not_checked"] },
+        "conflicting_decision_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "override_status": {
+      "type": "string",
+      "enum": ["none", "requested", "approved", "refused", "not_applicable"]
+    },
+    "contested_status": {
+      "type": "string",
+      "enum": ["not_contested", "contested", "resolved", "not_applicable"]
+    },
+    "revocation_or_cancellation_reason": {
+      "type": ["string", "null"]
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "paused",
+        "decision_ready",
+        "authorised",
+        "binding",
+        "hold_refused",
+        "release_refused",
+        "authority_refused",
+        "execution_refused",
+        "revoked_cancelled",
+        "bypass_violation"
+      ]
+    },
+    "external_consequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["occurred", "description"],
+      "properties": {
+        "occurred": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+    "downstream_state_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "result", "checked_systems"],
+      "properties": {
+        "performed": { "type": "boolean" },
+        "result": { "type": "string", "enum": ["no_downstream_change", "matching_binding_receipt_found", "change_without_binding_receipt", "not_applicable"] },
+        "checked_systems": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "bypass_check_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "result", "method"],
+      "properties": {
+        "performed": { "type": "boolean" },
+        "result": { "type": "string", "enum": ["no_bypass_detected", "bypass_detected", "not_applicable"] },
+        "method": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence_uri": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "previous_hash": {
+      "type": ["string", "null"],
+      "description": "Required for chained receipt stores after the first record."
+    },
+    "record_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tamper_evidence_store": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["store_type", "anchor_uri"],
+      "properties": {
+        "store_type": { "type": "string", "enum": ["append_only_log", "chained_hashes", "external_audit_store"] },
+        "anchor_uri": { "type": "string", "minLength": 1 }
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "state": {
+      "type": "string",
+      "enum": [
+        "PROPOSED",
+        "PAUSED",
+        "DECISION_READY",
+        "AUTHORISED",
+        "BINDING",
+        "REVOKED_CANCELLED",
+        "HOLD_REFUSED",
+        "RELEASE_REFUSED",
+        "AUTHORITY_REFUSED",
+        "EXECUTION_REFUSED",
+        "BYPASS_VIOLATION"
+      ]
+    }
+  }
+}
