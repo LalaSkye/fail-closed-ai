@@ -10,6 +10,8 @@ Governance fails not only when execution is uncontrolled, but when decision-read
 
 Current status: design and test harness only. No canonical runtime implementation is shipped with this version.
 
+All public descriptions of this stack must follow `CLAIM_BOUNDARY_PUBLIC_NOTE_v0.1.md`.
+
 ## Core thesis
 
 Governance only matters where consequence can be stopped.
