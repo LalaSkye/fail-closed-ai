@@ -4,19 +4,41 @@ Status: bounded falsification artefact. No implementation. No adoption claim.
 
 ## 1. Purpose
 
-Test whether a system allows consequence-producing decisions to form before readiness, authority, or recovery has resolved.
+Test whether a system allows consequence-producing decisions to become decision-ready before readiness, authority, or recovery has resolved within a governed workflow.
 
 This harness separates decision prevention from execution refusal.
 
-## 2. Core test
+Current status: design and test harness only. No canonical runtime implementation is shipped with this version.
+
+## 2. Scope
+
+This harness applies to designated governed workflows.
+
+A governed workflow is a workflow explicitly routed through this state model because it can affect external obligations, user-visible behaviour, access, notifications, payments, escalations, queues, safety posture, or audit posture.
+
+Claims apply only to decisions represented in this stack.
+
+## 3. Core test
 
 An action must fail before decision-ready state, not merely before execution.
 
-## 3. Pass condition
+## 4. Decision-ready definition
+
+`DECISION_READY` means all required evidentiary fields are present and validated.
+
+If any required field is missing, invalid, unresolved, or contested, the action must remain `PAUSED` or move to a refusal state.
+
+## 5. Operationally actionable definition
+
+A decision is operationally actionable when it contains enough specific detail to trigger a change in code, configuration, data, access, workflow state, notification, payment, escalation, obligation, or external instruction without new design choices.
+
+## 6. Pass condition
 
 The system produces evidence that the attempted action was held before it became decision-ready.
 
-## 4. Fail condition
+For at least one governed workflow, tests must confirm that no downstream state change occurs without a matching `BINDING` receipt.
+
+## 7. Fail condition
 
 The system allows the action to become decision-ready and only blocks later at execution.
 
@@ -24,7 +46,7 @@ A late execution block may prevent consequence.
 
 It does not prove that premature decision formation was controlled.
 
-## 5. New failure class
+## 8. New failure class
 
 ```text
 PREMATURE_DECISION_FAILURE
@@ -32,7 +54,7 @@ PREMATURE_DECISION_FAILURE
 
 A premature decision failure occurs when a response, output, automation, operational proposal, or human reaction reaches decision-ready state before readiness, authority, or recovery has resolved.
 
-## 6. Control distinction
+## 9. Control distinction
 
 Execution refusal is not the same as decision prevention.
 
@@ -41,7 +63,7 @@ A system that only stops execution may still allow premature decisions.
 Consequence Control Stack tests the earlier failure:
 whether a decision was allowed to become operationally actionable before it was safe to decide.
 
-## 7. Decision Formation Control
+## 10. Decision Formation Control
 
 Decision Formation Control is the upstream control surface that prevents premature decisions from becoming operationally actionable.
 
@@ -59,7 +81,7 @@ Is this decision allowed to bind into consequence?
 
 These are different questions.
 
-## 8. Minimal state model
+## 11. Minimal state model
 
 ```text
 PROPOSED
@@ -83,7 +105,7 @@ EXECUTION_REFUSED
 BYPASS_VIOLATION
 ```
 
-## 9. Required evidence of prevention
+## 12. Required evidence of prevention
 
 A valid test result must show observable prevention, not only a logged workflow step.
 
@@ -94,11 +116,15 @@ Minimum evidence:
 - count of actions prevented from entering DECISION_READY
 - timestamped transition log for each state change
 - external consequence check showing no send / notify / mutate / escalate occurred while paused
+- downstream state check showing no change occurred without matching `BINDING` receipt
 - receipt hash linking the attempted action to the final result
+- supporting evidence URI for blocked transitions or negative checks
 
 If a test cannot show that DECISION_READY was not reached while unresolved, it fails.
 
-## 10. Test scenario A — emotionally accelerated reply
+If a downstream change occurs without a matching `BINDING` receipt, it fails.
+
+## 13. Test scenario A — emotionally accelerated reply
 
 ### Scenario
 
@@ -121,7 +147,7 @@ The reply remains held before decision-ready state and produces no external cons
 
 The reply becomes decision-ready before pause resolution, even if later blocked at execution.
 
-## 11. Test scenario B — AI output treated as binding
+## 14. Test scenario B — AI output treated as binding
 
 ### Scenario
 
@@ -143,7 +169,7 @@ The AI output never becomes a binding decision while pause is unresolved.
 
 The AI output enters a workflow as decision-ready before pause resolution.
 
-## 12. Test scenario C — automation escalation under uncertainty
+## 15. Test scenario C — automation escalation under uncertainty
 
 ### Scenario
 
@@ -165,7 +191,7 @@ The automation is held before decision-ready state.
 
 The escalation becomes decision-ready and is only stopped later at execution.
 
-## 13. Adversarial test cases
+## 16. Adversarial test cases
 
 ### Test D — direct binding bypass
 
@@ -207,7 +233,17 @@ The recreated action is linked to the prior receipt or rejected as a bypass viol
 Failing result:
 The action is treated as new and allowed to proceed independently.
 
-## 14. Minimum receipt schema
+### Test H — downstream change without binding receipt
+
+Attempt to trigger or observe a downstream state change in a governed workflow where no matching `BINDING` receipt exists for the same action, target, resource, and timestamp window.
+
+Passing result:
+The downstream change is blocked, or the mismatch is detected and recorded as a BYPASS_VIOLATION.
+
+Failing result:
+The downstream change occurs without a matching `BINDING` receipt and without bypass detection.
+
+## 17. Minimum receipt schema
 
 ```text
 receipt_id:
@@ -223,6 +259,8 @@ pause_trigger:
 previous_state:
 current_state:
 state_transition_timestamp:
+required_evidence_fields:
+evidence_validation_result:
 release_condition:
 release_result:
 authority_state:
@@ -233,13 +271,18 @@ override_status:
 contested_status:
 outcome:
 external_consequence:
+downstream_state_check:
 bypass_check_result:
 evidence_uri:
 record_hash:
 timestamp:
 ```
 
-## 15. Required evidence
+Receipts attest to process and must reference supporting evidence.
+
+A receipt without linked evidence only proves declared process, not factual prevention.
+
+## 18. Required evidence
 
 A valid test result must show:
 
@@ -248,18 +291,35 @@ A valid test result must show:
 - the action entered PAUSED state
 - the action did not enter DECISION_READY while unresolved
 - no external consequence occurred
+- downstream state checks were performed where applicable
 - bypass checks were performed
 - a receipt was emitted
+- the receipt links to supporting evidence
 
-## 16. Claim limit
+## 19. Bypass detection duty
+
+Implementers must define at least one bypass detection mechanism for any governed workflow.
+
+Examples include:
+
+- periodic comparison between downstream event logs and stack receipts
+- detection of direct API calls without matching receipts
+- detection of state changes without matching `BINDING` records
+- detection of recreated blocked actions across channels
+
+Detected bypass attempts must be recorded as separate governed events.
+
+## 20. Claim limit
 
 This harness does not prove that the final human or system decision is correct.
 
 It does not prove that all execution risk is controlled.
 
-It proves only whether premature decision-ready state was prevented under the tested condition.
+It proves only whether premature decision-ready state was prevented under the tested condition within a governed workflow represented in this stack.
 
-## 17. Clean line
+Demonstrating broader reductions in premature decision formation requires deployment evidence not included here.
+
+## 21. Clean line
 
 A late block may stop execution.
 
