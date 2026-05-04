@@ -1,10 +1,10 @@
 # Fail-Closed AI
 
-**Reference architecture for AI systems that stop before unsafe consequence.**
+**Documentation-first reference for AI systems that stop before unsafe consequence.**
 
 Most AI governance tells systems what they should not do.
 
-Fail-closed AI makes invalid action paths unable to execute.
+Fail-closed AI describes the boundary pattern for making invalid action paths unable to execute.
 
 The core question is simple:
 
@@ -14,7 +14,7 @@ The core question is simple:
 
 ## Core invariant
 
-No AI-controlled action may become consequence unless the transition is:
+No AI-controlled action should become consequence unless the transition is:
 
 - admissible
 - authorised
@@ -23,7 +23,7 @@ No AI-controlled action may become consequence unless the transition is:
 - unreplayed
 - receipt-bearing
 
-If any check fails, the system does not continue.
+If any check fails, the system must not continue.
 
 It holds.
 
@@ -49,7 +49,7 @@ consequence
 receipt
 ```
 
-The corridor exists to prevent invalid transitions from becoming real-world effects.
+The corridor describes how invalid transitions are prevented from becoming real-world effects.
 
 A policy may describe a rule.
 
@@ -94,7 +94,7 @@ Ambiguity is not permission.
 
 ---
 
-## Related kernel
+## Related executable kernel
 
 The first working kernel is here:
 
@@ -102,9 +102,9 @@ The first working kernel is here:
 
 That repo demonstrates one narrow invariant:
 
-> No state mutation without a valid `DecisionRecord`.
+> No state mutation without a valid `DecisionRecord` on the demonstrated path.
 
-This repository is the wider reference architecture around that kernel.
+This repository is the wider documentation-first reference around that kernel.
 
 ---
 
@@ -122,12 +122,10 @@ fail-closed-ai/
 │   ├── 05-execution-boundary.md
 │   ├── 06-receipts.md
 │   └── 07-threat-model.md
-├── reference/
-│   ├── decision_record.schema.json
-│   ├── receipt.schema.json
-│   └── verdicts.md
-└── examples/
-    └── unsafe-email-send.md
+└── reference/
+    ├── decision_record.schema.json
+    ├── receipt.schema.json
+    └── verdicts.md
 ```
 
 The initial public surface is documentation-first.
@@ -146,7 +144,7 @@ It claims something narrower and more testable:
 
 That claim can be inspected.
 
-That claim can be tested.
+That claim can be tested in an executable kernel.
 
 That claim can fail.
 
@@ -156,9 +154,9 @@ Good. That is what makes it engineering.
 
 ## What this does not prove
 
-This repository does not prove adoption, certification, standardisation, or production readiness.
+This repository does not prove adoption, certification, standardisation, production readiness, runtime enforcement, or path-universal deployment coverage.
 
-It demonstrates a bounded execution-control surface that can be run, inspected, and tested.
+It documents a bounded execution-control pattern and points to executable proof surfaces where implementation exists.
 
 ---
 
@@ -175,7 +173,7 @@ It demonstrates a bounded execution-control surface that can be run, inspected, 
 
 ## Status
 
-`v0.1` — canonical anchor established.
+`v0.1` — documentation-first anchor established.
 
 Next work:
 
