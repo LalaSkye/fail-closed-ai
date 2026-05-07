@@ -1,0 +1,21 @@
+{
+  "scenario": "A human operator attempts to override a prior refusal on a high-consequence payment action while under pressure.",
+  "request": {
+    "operator_id": "human-003",
+    "role": "ops_lead",
+    "authority_scope": ["approve_payment"],
+    "action_type": "approve_payment",
+    "consequence_class": "high",
+    "override_requested": true,
+    "reason": "customer escalation",
+    "state_signal": "pressured",
+    "time_pressure": true,
+    "repeat_override_count": 1,
+    "recent_refusal_count": 2,
+    "second_authority_present": false
+  },
+  "expected_outcome": "HOLD",
+  "expected_reason": "high_consequence_override_requires_stable_operator_or_second_authority",
+  "expected_commit_gate_may_be_called": false,
+  "claim": "The human override path is intercepted before CommitGate. The operator cannot silently become the bypass."
+}
