@@ -1,5 +1,8 @@
 # Fail-Closed AI
 
+**Research Surface Map:** [lalaSkye.github.io/inspection-surface](https://lalaskye.github.io/inspection-surface/) — full index, provenance, and cross-links
+
+
 ## Public disclosure boundary
 
 This repository is a public inspection surface, not full architecture disclosure.
